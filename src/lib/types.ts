@@ -28,6 +28,8 @@ export type Expense = {
   createdAt: number;
 };
 
+export const SAMPLE_TRIP_ID = "sample-seoul-osaka";
+
 export type Trip = {
   id: string;
   name: string;
@@ -40,6 +42,9 @@ export type Trip = {
   createdAt: number;
   /** Frozen copy of the rates used to settle this trip. Absent means the shared book. */
   rateBook?: RateBook;
+  /** Set only on this device. Not part of the shared trip body. */
+  shareCode?: string;
+  shareVersion?: number;
 };
 
 export type RateSource = "yahoo" | "manual" | "estimate";

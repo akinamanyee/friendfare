@@ -1,10 +1,10 @@
 # Friendfare
 
-Split travel spending with friends.
+Travel ledger for a group. Log bills in yen, won, euros, US dollars, RMB, or Hong Kong dollars, and split what is still owed.
 
 Live app: https://friendfare.grok.me
 
-Log expenses on a trip, in several currencies, with more than one payer. At the end, Friendfare converts with Yahoo rates and works out who still owes whom.
+One person starts a trip. Share a code only if a friend should use the same trip. Logging alone does not need a code. The code is the only key. Bills already logged go with it.
 
 ## Run
 
@@ -12,3 +12,5 @@ Log expenses on a trip, in several currencies, with more than one payer. At the 
 npm install
 npm run dev
 ```
+
+The preview listens on port 8080.

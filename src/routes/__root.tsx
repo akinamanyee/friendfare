@@ -6,6 +6,7 @@ import appCss from "../styles.css?url";
 
 const APP_NAME = "Friendfare";
 
+/** Same public-host guard the share injector uses for og:image. */
 function shareHost(): string {
   const host = String(import.meta.env.VITE_PUBLIC_HOSTNAME ?? "")
     .trim()
@@ -13,7 +14,14 @@ function shareHost(): string {
     .replace(/:\d+$/, "");
   if (!host || !/^[a-z0-9.-]+$/.test(host) || !host.includes(".")) return "";
   if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(host)) return "";
-  if (host === "vercel.app" || host.endsWith(".vercel.app") || host === "vercel.com" || host.endsWith(".vercel.com")) return "";
+  if (
+    host === "vercel.app" ||
+    host.endsWith(".vercel.app") ||
+    host === "vercel.com" ||
+    host.endsWith(".vercel.com")
+  ) {
+    return "";
+  }
   return host;
 }
 
@@ -26,14 +34,20 @@ export const Route = createRootRoute({
         { charSet: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         { title: APP_NAME },
-        { name: "description", content: "Log travel spending with friends and split what is still owed." },
+        {
+          name: "description",
+          content: "Log travel spending with friends and split what is still owed.",
+        },
         { name: "theme-color", content: "#f7f3e8" },
         ...(xBanner ? [{ property: "x:game:image", content: xBanner }] : []),
       ],
       links: [
         { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
         { rel: "stylesheet", href: appCss },
-        { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@400;500;600&display=swap" },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@400;500;600&display=swap",
+        },
         { rel: "manifest", href: "/__grok/manifest.webmanifest" },
         { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
       ],

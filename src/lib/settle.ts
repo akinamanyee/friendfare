@@ -62,15 +62,26 @@ export function settle(trip: Trip, perUsd: Record<Currency, number>): Settlement
     balance.net = roundMoney(balance.paid - balance.share, currency);
   }
 
-  const drift = roundMoney(balances.reduce((sum, balance) => sum + balance.net, 0), currency);
+  const drift = roundMoney(
+    balances.reduce((sum, balance) => sum + balance.net, 0),
+    currency,
+  );
   if (drift !== 0 && balances.length > 0) {
-    const target = balances.reduce((best, balance) => Math.abs(balance.net) > Math.abs(best.net) ? balance : best);
+    const target = balances.reduce((best, balance) =>
+      Math.abs(balance.net) > Math.abs(best.net) ? balance : best,
+    );
     target.net = roundMoney(target.net - drift, currency);
   }
 
   const dust = moneyTolerance(currency);
-  const debtors = balances.filter((b) => b.net < -dust).map((b) => ({ id: b.memberId, name: b.name, left: -b.net })).sort((a, b) => b.left - a.left);
-  const creditors = balances.filter((b) => b.net > dust).map((b) => ({ id: b.memberId, name: b.name, left: b.net })).sort((a, b) => b.left - a.left);
+  const debtors = balances
+    .filter((b) => b.net < -dust)
+    .map((b) => ({ id: b.memberId, name: b.name, left: -b.net }))
+    .sort((a, b) => b.left - a.left);
+  const creditors = balances
+    .filter((b) => b.net > dust)
+    .map((b) => ({ id: b.memberId, name: b.name, left: b.net }))
+    .sort((a, b) => b.left - a.left);
 
   const transfers: Transfer[] = [];
   let i = 0;
@@ -79,7 +90,13 @@ export function settle(trip: Trip, perUsd: Record<Currency, number>): Settlement
     const pay = Math.min(debtors[i].left, creditors[j].left);
     const amount = roundMoney(pay, currency);
     if (amount > 0) {
-      transfers.push({ fromId: debtors[i].id, fromName: debtors[i].name, toId: creditors[j].id, toName: creditors[j].name, amount });
+      transfers.push({
+        fromId: debtors[i].id,
+        fromName: debtors[i].name,
+        toId: creditors[j].id,
+        toName: creditors[j].name,
+        amount,
+      });
     }
     debtors[i].left -= pay;
     creditors[j].left -= pay;
@@ -87,5 +104,10 @@ export function settle(trip: Trip, perUsd: Record<Currency, number>): Settlement
     if (creditors[j].left <= dust) j += 1;
   }
 
-  return { currency, spent: roundMoney(spent, currency), balances, transfers };
+  return {
+    currency,
+    spent: roundMoney(spent, currency),
+    balances,
+    transfers,
+  };
 }

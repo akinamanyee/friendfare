@@ -105,7 +105,12 @@ export function parseAmountInput(text: string): number | null {
   return value;
 }
 
-export function convert(amount: number, from: Currency, to: Currency, perUsd: Record<Currency, number>): number {
+export function convert(
+  amount: number,
+  from: Currency,
+  to: Currency,
+  perUsd: Record<Currency, number>,
+): number {
   const fromRate = perUsd[from];
   const toRate = perUsd[to];
   if (!fromRate || !toRate) return 0;
@@ -113,7 +118,12 @@ export function convert(amount: number, from: Currency, to: Currency, perUsd: Re
   return (amount / fromRate) * toRate;
 }
 
-export function rateLot(from: Currency, to: Currency, perUsd: Record<Currency, number>): { units: number; amount: number } {
+/** Round lot of `from` that converts into a readable amount of `to` (1, 10, 100, or 1,000). */
+export function rateLot(
+  from: Currency,
+  to: Currency,
+  perUsd: Record<Currency, number>,
+): { units: number; amount: number } {
   const one = convert(1, from, to, perUsd);
   let units = 1;
   if (one > 0 && one < 0.01) units = 1000;
@@ -122,7 +132,14 @@ export function rateLot(from: Currency, to: Currency, perUsd: Record<Currency, n
   return { units, amount: one * units };
 }
 
-export function perUsdFromDisplayed(from: Currency, to: Currency, units: number, amount: number, perUsd: Record<Currency, number>): { currency: Exclude<Currency, "USD">; perUsd: number } | null {
+/** Turn "units of from = amount of to" back into the per-USD quote the store keeps. */
+export function perUsdFromDisplayed(
+  from: Currency,
+  to: Currency,
+  units: number,
+  amount: number,
+  perUsd: Record<Currency, number>,
+): { currency: Exclude<Currency, "USD">; perUsd: number } | null {
   if (from === to || !(amount > 0) || !(units > 0)) return null;
   if (from === "USD") {
     if (to === "USD") return null;
@@ -151,6 +168,7 @@ export function formatISODate(iso: string): string {
   return `${d} ${MONTHS[m - 1]} ${y}`;
 }
 
+/** Calendar day in the device timezone, not UTC. */
 export function formatLocalDate(ts: number): string {
   const d = new Date(ts);
   if (Number.isNaN(d.getTime())) return "";
@@ -180,7 +198,13 @@ export function equalSplit(amount: number, ids: string[], currency: Currency): R
   return out;
 }
 
-export function absorbRemainder(amount: number, ids: string[], currency: Currency, current: Record<string, number>): Record<string, number> {
+/** Keep every payer except the last, and put whatever is left on the last person. */
+export function absorbRemainder(
+  amount: number,
+  ids: string[],
+  currency: Currency,
+  current: Record<string, number>,
+): Record<string, number> {
   if (ids.length === 0) return {};
   const factor = 10 ** decimals(currency);
   const total = Math.round(amount * factor);
